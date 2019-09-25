@@ -5,8 +5,6 @@ admin.initializeApp();
 const firebase = require('firebase');
 const db = admin.firestore(); 
 
-
-
 const firebaseConfig = {
     apiKey: "AIzaSyAoyTJ0uoZgk8BpJ8t6sDkAwhgfKAfv3gg",
     authDomain: "social-tut-cb2e8.firebaseapp.com",
@@ -14,16 +12,41 @@ const firebaseConfig = {
     projectId: "social-tut-cb2e8",
     storageBucket: "social-tut-cb2e8.appspot.com",
     messagingSenderId: "562821895354",
-    appId: "1:562821895354:web:fcb1d1f7adf1a1d4945e83"
+    appId: "1:562821895354:web:fcb1d1f7adf1a1d4945e83",
+    measurementId: "G-2E056PP80J"
   };
 firebase.initializeApp(firebaseConfig);
 
 
-// Create and Deploy Your First Cloud Functions
-// https://firebase.google.com/docs/functions/write-firebase-functions
+const FBAuth = (request, response, next) => {
+    let idToken;
+    if(request.headers.authorization && request.headers.authorization.startsWith('Bearer ')){
+        idToken = request.headers.authorization.split('Bearer ')[1]
+    } else {
+        console.error('No Token Found')
+       return resonse.status(403).json({ error: 'Unauthorized'})
+    }
+    admin.auth().verifyIdToken(idToken)
+    .then(decodedToken => {
+        request.user = decodedToken
+        console.log(decodedToken)
+        return db.collection('users')
+            .where('userId', '==', request.user.uid)
+            .limit(1)
+            .get()
+    })
+    .then(data => {
+        request.user.handle = data.docs[0].data().handle;
+        return next()
+    }) 
+    .catch(err => {
+        console.error('Error while verifying token', err)
+        return response.status(403).json(err)
+    })
+}
 
 
-app.get('/screams', (request, response) => {
+app.get('/screams', FBAuth, (request, response) => {
     db
         .collection('screams')
         .orderBy('createdAt', 'desc')
@@ -43,13 +66,13 @@ app.get('/screams', (request, response) => {
         .catch((err) => console.error(err))
 });
 
-app.post('/scream', (request, response) => {
+app.post('/scream', FBAuth, (request, response) => {
     if (request.method !== 'POST'){
         return response.status(400).json({ error: "Method not allowed"})
     }
     const newScream = {
         body: request.body.body,
-        userHandle: request.body.userHandle,
+        userHandle: request.user.handle,
         createdAt: new Date().toISOString()
     };
 
