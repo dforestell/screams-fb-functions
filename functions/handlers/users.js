@@ -97,6 +97,29 @@ exports.addUserDetails = (request, response) => {
         })
 }
 
+// get own user details
+exports.getAuthenticatedUser = (request, response) => {
+    let userData = {};
+    db.doc(`users/${request.user.handle}`).get()
+        .then(doc => {
+            if(doc.exists){
+                userData.credentials = doc.data();
+                return db.collection('likes').where('userHander', '==', request.user.handle).get()
+            }
+        })
+        .then(data => {
+            userData.likes = [];
+            data.forEach(doc => {
+                userData.likes.push(doc.data())
+            })
+            return response.json(userData);
+        })
+        .catch(err =>{
+            console.error(err);
+            response.status(500).json({ error: err.code })
+        })
+}
+
 // Add user profile image
 exports.uploadImage = (request, response) => {
     const BusBoy = require('busboy');
