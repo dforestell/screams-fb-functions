@@ -106,20 +106,6 @@ exports.login = (request, response) => {
 // Add user details
 exports.addUserDetails = (request, response) => {
   let userDetails = reduceUserDetails(request.body);
-<<<<<<< HEAD
-=======
-
-  db.doc(`/users/${request.user.handle}`)
-    .update(userDetails)
-    .then(() => {
-      return response.json({ message: "Details Successfully Added" });
-    })
-    .catch(err => {
-      console.error(err);
-      return response.status(500).json({ error: err.code });
-    });
-};
->>>>>>> master
 
   db.doc(`/users/${request.user.handle}`)
     .update(userDetails)
@@ -188,29 +174,6 @@ exports.getAuthenticatedUser = (request, response) => {
       data.forEach(doc => {
         userData.likes.push(doc.data());
       });
-<<<<<<< HEAD
-=======
-      return db
-        .collection("notifications")
-        .where("recipient", "==", request.user.handle)
-        .orderBy("createdAt", "desc")
-        .limit(10)
-        .get();
-    })
-    .then(data => {
-      userData.notifications = [];
-      data.forEach(doc => {
-        userData.notifications.push({
-          recipient: doc.data().recipient,
-          sender: doc.data().sender,
-          createdAt: doc.data().createdAt,
-          screamId: doc.data().screamId,
-          type: doc.data().type,
-          read: doc.data().read,
-          notificationId: doc.id
-        });
-      });
->>>>>>> master
       return response.json(userData);
     })
     .catch(err => {
@@ -268,7 +231,6 @@ exports.uploadImage = (request, response) => {
   });
   busboy.end(request.rawBody);
 };
-<<<<<<< HEAD
 
 exports.markNotificationsRead = (request, response) => {
   let batch = db.batch();
@@ -286,5 +248,3 @@ exports.markNotificationsRead = (request, response) => {
       response.status(500).json({ error: err.code });
     });
 };
-=======
->>>>>>> master
