@@ -12,7 +12,7 @@ exports.getAllScreams = (request, response) => {
           body: doc.data().body,
           userHandle: doc.data().userHandle,
           createdAt: doc.data().createdAt,
-          commentCount: doc.data()commentCount,
+          commentCount: doc.data().commentCount,
           likeCount: doc.data().likeCount,
           userImage: doc.data().userImage
         });
@@ -126,7 +126,7 @@ exports.likeScream = (request, response) => {
   screamDocument
     .get()
     .then(doc => {
-      if (doc.exists && doc.data().userHandle !== snapshot.userHandle) {
+      if (doc.exists) {
         screamData = doc.data();
         screamData.screamId = doc.id;
         return likeDocument.get();
