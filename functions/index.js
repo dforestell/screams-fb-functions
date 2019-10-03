@@ -52,7 +52,7 @@ exports.createNotificationOnLike = functions
       .doc(`/screams/${snapshot.data().screamId}`)
       .get()
       .then(doc => {
-        if (doc.exists) {
+        if (doc.exists && doc.data().userHandle !== snapshot.userHandle) {
           return db.doc(`/notifications/${snapshot.id}`).set({
             createdAt: new Date().toISOString(),
             recipient: doc.data().userHandle,
@@ -93,7 +93,7 @@ exports.createNotificationOnComment = functions
       .doc(`/screams/${snapshot.data().screamId}`)
       .get()
       .then(doc => {
-        if (doc.exists) {
+        if (doc.exists && doc.data().userHandle !== snapshot.userHandle) {
           db.doc(`/notifications/${snapshot.id}`).set({
             createdAt: new Date().toISOString(),
             recipient: doc.data().userHandle,
@@ -103,9 +103,6 @@ exports.createNotificationOnComment = functions
             screamId: doc.id
           });
         }
-      })
-      .then(() => {
-        return;
       })
       .catch(err => {
         console.error(err);
