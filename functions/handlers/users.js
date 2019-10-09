@@ -86,17 +86,9 @@ exports.login = (request, response) => {
       return response.json({ token });
     })
     .catch(err => {
-      console.error(err);
-      if (
-        err.code === "auth/user-not-found" ||
-        err.code === "auth/wrong-password"
-      ) {
-        return response
-          .status(403)
-          .json({ errors: { general: "Wrong Credentials, please try again" } });
-      } else {
-        return response.status(500).json({ error: err.code });
-      }
+      return response
+        .status(403)
+        .json({ errors: { general: "Wrong Credentials, please try again" } });
     });
 };
 // Add user details
