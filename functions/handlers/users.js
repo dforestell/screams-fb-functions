@@ -93,7 +93,7 @@ exports.login = (request, response) => {
       ) {
         return response
           .status(403)
-          .json({ general: "Wrong Credentials, please try again" });
+          .json({ errors: { general: "Wrong Credentials, please try again" } });
       } else {
         return response.status(500).json({ error: err.code });
       }
